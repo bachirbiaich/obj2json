@@ -28,9 +28,11 @@ public class Obj2JsonConverter {
     }
 
     private void convertObject(Object obj, Class<?> clss) {
+    	//On vérifie que l'objet n'est pas null
     	if(obj!=null)
         {
-            if(clss.isArray())
+            //Si l'objet est de type tableau
+    		if(clss.isArray())
             { 
             	boolean isPrimitiveArray = clss.getComponentType().isPrimitive();
             	if(isPrimitiveArray)
@@ -38,12 +40,16 @@ public class Obj2JsonConverter {
             	else
             		convertArray(obj,clss);
             }
+    		//Si l'objet est de type primitif
             else if(clss.isPrimitive())
             	convertPrimitive(obj,clss);
+    		//Si l'objet est une chaine de caractère
             else if(clss.equals(String.class))
             	out.append("\""+obj+"\"");
+    		//Si l'objet est de type Class<?>
             else if(clss.equals(Class.class))
             	out.append("\"Class:"+Class.class.getName()+"\"");
+    		//S'il s'agit d'un autre objet
             else
             {
             	out.append("{\n");
@@ -52,6 +58,7 @@ public class Obj2JsonConverter {
             	out.append("}");
             }
         }
+    	//Si l'objet est null on affiche null
         else
         	out.append("null");
     }
@@ -69,23 +76,27 @@ public class Obj2JsonConverter {
             Field field = fields[i];
             String name = field.getName();
             printIndent();
+            //On affiche le nom de l'attribut
             out.append("\""+name+"\": ");
+            //On rend l'attribut accessible pour pouvoir le lire
             field.setAccessible(true);
             
             Object fieldValue=null;
             try 
             {
-				fieldValue = (Object)field.get(obj);
+				//On recupere l'objet dans la variable fieldValue
+            	fieldValue = (Object)field.get(obj);
 			} 
             catch (IllegalArgumentException | IllegalAccessException e) 
             {
 				out.append(e.getMessage());
 			}
-            	
+            //On recupère l'objet dans objField et sa classe dans clssObjField s'il n'est pas nul
             Object objField=fieldValue;
             Class<?> clssObjField=null;
             if(objField!=null)
             	clssObjField=field.getType();
+            //On convertit l'objet en format JSON
             convertObject(objField,clssObjField);
             out.append(",\n");
         }
@@ -93,6 +104,7 @@ public class Obj2JsonConverter {
     }
 
     private void convertPrimitive(Object obj, Class<?> clss) {
+    	//S'il s'agit d'un caracatère
     	if(clss.getName().equals("java.lang.Character") || clss.getName().equals("char"))
     		out.append("'"+escapeChar((char)obj)+"'");
     	else
@@ -104,6 +116,7 @@ public class Obj2JsonConverter {
     	indentLevel++;
     	int length = Array.getLength(obj);
     	Object element=null;
+    	//On convertit chaque objet contenu dans le tableau d'objets en format JSON
     	for(int j=0;j<length;j++)
     	{
     		element = Array.get(obj, j);
@@ -127,6 +140,7 @@ public class Obj2JsonConverter {
     	out.append("[ ");
     	int length = Array.getLength(obj);
     	Object element=null;
+    	//On convertit chaque objet primitif contenu dans le tableau en format JSON
     	for(int j=0;j<length;j++)
     	{
     		element = Array.get(obj, j);
