@@ -2,6 +2,7 @@ package main.java.fr.iut.obj2json;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.Date;
 
 public class Obj2JsonConverter {
 
@@ -49,6 +50,9 @@ public class Obj2JsonConverter {
     		//Si l'objet est de type Class<?>
             else if(clss.equals(Class.class))
             	out.append("\"Class:"+Class.class.getName()+"\"");
+    		//Si l'objet est de type Date
+            else if(clss.equals(Date.class))
+            	out.append(obj);
     		//S'il s'agit d'un autre objet
             else
             {
